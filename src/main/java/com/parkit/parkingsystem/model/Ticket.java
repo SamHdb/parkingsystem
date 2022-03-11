@@ -11,6 +11,12 @@ public class Ticket {
     private Date inTime;
     private Date outTime;
 
+    public boolean isRecurrent() {return isRecurrent;}
+
+    public void setRecurrent(boolean recurrent) {isRecurrent = recurrent;    }
+
+    private boolean isRecurrent;
+
     public int getId() {
         return id;
     }
@@ -58,4 +64,5 @@ public class Ticket {
     public void setOutTime(Date outTime) {
         this.outTime = outTime;
     }
+
 }

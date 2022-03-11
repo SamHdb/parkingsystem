@@ -22,12 +22,15 @@ public class FareCalculatorService {
         float durationInHour = duration / 3600000.00f; // la durée est par défaut en ms, on la convertit en heures
 
         // on prend en compte les 30 min gratuites, si duration < 30 min alors prix à 0 sinon on déduit du calcul les 30 min gratuites
-
+        if (ticket.isRecurrent()) {
+            durationInHour = (float) (durationInHour * DISCOUNT_RECURRENT_USER);
+        }
         switch (ticket.getParkingSpot().getParkingType()) {
             case CAR: {
                 if (durationInHour < 0.5) {
                     ticket.setPrice(0);
-                } else {
+                } else{
+                    //if (ticketDAO.isRecurrentUser = true){ticket.setPrice((durationInHour - THIRTY_MIN_FREE) * Fare.CAR_RATE_PER_HOUR * DISCOUNT_RECURRENT_USER);else
                     ticket.setPrice((durationInHour - THIRTY_MIN_FREE) * Fare.CAR_RATE_PER_HOUR);
                 }
                 break;
@@ -35,7 +38,7 @@ public class FareCalculatorService {
             case BIKE: {
                 if (durationInHour < 0.5) {
                     ticket.setPrice(0);
-                } else {
+                } else {//if (recurrentUser){ticket.setPrice((durationInHour - THIRTY_MIN_FREE) * Fare.BIKE_RATE_PER_HOUR * DISCOUNT_RECURRENT_USER);else
                     ticket.setPrice((durationInHour - THIRTY_MIN_FREE) * Fare.BIKE_RATE_PER_HOUR);
                 }
                 break;
