@@ -16,36 +16,41 @@ public class TicketDAO {
 
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
-    public boolean saveTicket(Ticket ticket) {
+    public void saveTicket(Ticket ticket) throws SQLException {
         Connection con = null;
+        PreparedStatement ps = null;
         try {
             con = dataBaseConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement(DBConstants.SAVE_TICKET);
-            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
+            ps = con.prepareStatement(DBConstants.SAVE_TICKET);
+            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME, IS_RECURRENT)
             //ps.setInt(1,ticket.getId());
             ps.setInt(1, ticket.getParkingSpot().getId());
             ps.setString(2, ticket.getVehicleRegNumber());
             ps.setDouble(3, ticket.getPrice());
             ps.setTimestamp(4, new Timestamp(ticket.getInTime().getTime()));
-            ps.setTimestamp(5, (ticket.getOutTime() == null) ? null : (new Timestamp(ticket.getOutTime().getTime())));
+            ps.setTimestamp(5, null);
             ps.setBoolean(6,ticket.isRecurrent());
-            return ps.execute();
+            ps.execute();
         } catch (Exception ex) {
             logger.error("Error fetching next available slot", ex);
-        }finally {
+        } finally {
             dataBaseConfig.closeConnection(con);
-        }return false;
+            dataBaseConfig.closePreparedStatement(ps);
+        }
     }
 
-    public Ticket getTicket(String vehicleRegNumber) {
+    public Ticket getTicket(String vehicleRegNumber) throws SQLException {
         Connection con = null;
         Ticket ticket = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
         try {
             con = dataBaseConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement(DBConstants.GET_TICKET);
-            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
+            ps = con.prepareStatement(DBConstants.GET_TICKET);
+            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME, IS_RECURRENT)
             ps.setString(1, vehicleRegNumber);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             if (rs.next()) {
                 ticket = new Ticket();
                 ParkingSpot parkingSpot = new ParkingSpot(rs.getInt(1), ParkingType.valueOf(rs.getString(6)), false);
@@ -55,21 +60,23 @@ public class TicketDAO {
                 ticket.setPrice(rs.getDouble(3));
                 ticket.setInTime(rs.getTimestamp(4));
                 ticket.setOutTime(rs.getTimestamp(5));
+                ticket.setRecurrent(rs.getBoolean(7));
             }
-            dataBaseConfig.closeResultSet(rs);
-            dataBaseConfig.closePreparedStatement(ps);
         } catch (Exception ex) {
             logger.error("Error fetching next available slot", ex);
         } finally {
             dataBaseConfig.closeConnection(con);
+            dataBaseConfig.closeResultSet(rs);
+            dataBaseConfig.closePreparedStatement(ps);
         }return ticket;
     }
 
-    public boolean updateTicket(Ticket ticket) {
+    public boolean updateTicket(Ticket ticket) throws SQLException {
         Connection con = null;
+        PreparedStatement ps = null;
         try {
             con = dataBaseConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement(DBConstants.UPDATE_TICKET);
+            ps = con.prepareStatement(DBConstants.UPDATE_TICKET);
             ps.setDouble(1, ticket.getPrice());
             ps.setTimestamp(2, new Timestamp(ticket.getOutTime().getTime()));
             ps.setInt(3, ticket.getId());
@@ -79,26 +86,29 @@ public class TicketDAO {
             logger.error("Error saving ticket info", ex);
         } finally {
             dataBaseConfig.closeConnection(con);
+            dataBaseConfig.closePreparedStatement(ps);
         }
         return false;
     }
 
-    public boolean isRecurrentUser(String vehicleRegNumber) {
+    public boolean isRecurrent(String vehicleRegNumber) throws SQLException {
         Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         try {
             con = dataBaseConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement(DBConstants.IS_RECURRENT_USER);
+            ps = con.prepareStatement(DBConstants.IS_RECURRENT);
             ps.setString(1, vehicleRegNumber);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             if (rs.next()) {
                 return true;
             }
+        } catch (ClassNotFoundException | SQLException ex) {
+            logger.error("Error fetching recurrent users");
+        } finally {
+            dataBaseConfig.closeConnection(con);
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
-        } catch (Exception ex) {
-            logger.error("Error fetching recurrent users");
-        }finally {
-            dataBaseConfig.closeConnection(con);
         }
         return false;
     }

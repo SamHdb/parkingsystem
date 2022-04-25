@@ -11,6 +11,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Date;
 
+import static com.parkit.parkingsystem.service.FareCalculatorService.df;
+
 public class ParkingService {
 
     private static final Logger logger = LogManager.getLogger("ParkingService");
@@ -43,8 +45,9 @@ public class ParkingService {
                 ticket.setVehicleRegNumber(vehicleRegNumber);
                 ticket.setPrice(0);
                 ticket.setInTime(inTime);
+
                 ticket.setOutTime(null);
-                ticket.setRecurrent(ticketDAO.isRecurrentUser(vehicleRegNumber));
+                ticket.setRecurrent(ticketDAO.isRecurrent(vehicleRegNumber));
                 ticketDAO.saveTicket(ticket);
                     if (ticket.isRecurrent()){
                         System.out.println("Welcome back to your parking. You will benefit 5% discount");
