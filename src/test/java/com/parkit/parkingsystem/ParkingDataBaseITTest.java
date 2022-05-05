@@ -66,7 +66,7 @@ public class ParkingDataBaseITTest {
         testParkingACar();
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processExitingVehicle();
-        //TODO: check that the fare generated and out time are populated correctly in the database
+
         Ticket ticket = ticketDAO.getTicket("ABCDEF");
 
         Assertions.assertNotNull(ticket.getOutTime());
