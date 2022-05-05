@@ -25,15 +25,13 @@ public class FareCalculatorService {
 
         // la durée est par défaut en ms, on la convertit en heures
         float durationInHour = duration / 3600000f;
-        /*durationInHour = df.format(durationInHour);*/
 
         double coeff = 1;
         if (ticket.isRecurrent()) {
             coeff = DISCOUNT_RECURRENT_USER;
         }
 
-        // on prend en compte les 30 min gratuites, si duration < 30 min alors prix à 0 sinon on déduit du calcul
-                        // les 30 min gratuites
+        // si duration < 30 min alors prix à 0 sinon on déduit du calcul les 30 min gratuites
         switch (ticket.getParkingSpot().getParkingType()) {
             case CAR: {
                 if (durationInHour < 0.5) {

@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
+import java.util.ResourceBundle;
 
 public class DataBaseConfig {
 
@@ -11,14 +12,35 @@ public class DataBaseConfig {
 
     public Connection getConnection() throws ClassNotFoundException, SQLException {
         logger.info("Create DB connection");
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        return DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/prod?useUnicode=true" +
-                        "&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&" +
-                        "serverTimezone=UTC","root","MySQL");
+        ResourceBundle rd = ResourceBundle.getBundle("connexionConfig");
+        Connection con = null;
+
+        // driver name for mysql
+        String loadDriver = rd.getString("driver");
+
+        // url of the database
+        String dbURL = rd.getString("url");
+
+        // username to connect db
+        String dbUSERNAME = rd.getString("login");
+
+        // password to connect db
+        String dbPASSWORD = rd.getString("password");
+
+        try {
+            // load the driver
+            Class.forName(loadDriver);
+
+            // get the connection
+            con = DriverManager.getConnection(dbURL, dbUSERNAME, dbPASSWORD);
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+
+        return con;
     }
 
-    public void closeConnection(Connection con){
+        public void closeConnection(Connection con){
         if(con!=null){
             try {
                 con.close();

@@ -16,14 +16,13 @@ public class TicketDAO {
 
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
-    public void saveTicket(Ticket ticket) throws SQLException {
+    public void saveTicket(Ticket ticket) {
         Connection con = null;
         PreparedStatement ps = null;
         try {
             con = dataBaseConfig.getConnection();
             ps = con.prepareStatement(DBConstants.SAVE_TICKET);
-            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME, IS_RECURRENT)
-            //ps.setInt(1,ticket.getId());
+            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME, IS_RECURRENT
             ps.setInt(1, ticket.getParkingSpot().getId());
             ps.setString(2, ticket.getVehicleRegNumber());
             ps.setDouble(3, ticket.getPrice());
@@ -39,7 +38,7 @@ public class TicketDAO {
         }
     }
 
-    public Ticket getTicket(String vehicleRegNumber) throws SQLException {
+    public Ticket getTicket(String vehicleRegNumber) {
         Connection con = null;
         Ticket ticket = null;
         PreparedStatement ps = null;
@@ -48,7 +47,7 @@ public class TicketDAO {
         try {
             con = dataBaseConfig.getConnection();
             ps = con.prepareStatement(DBConstants.GET_TICKET);
-            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME, IS_RECURRENT)
+            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME, IS_RECURRENT
             ps.setString(1, vehicleRegNumber);
             rs = ps.executeQuery();
             if (rs.next()) {
@@ -71,7 +70,7 @@ public class TicketDAO {
         }return ticket;
     }
 
-    public boolean updateTicket(Ticket ticket) throws SQLException {
+    public boolean updateTicket(Ticket ticket) {
         Connection con = null;
         PreparedStatement ps = null;
         try {
@@ -91,7 +90,7 @@ public class TicketDAO {
         return false;
     }
 
-    public boolean isRecurrent(String vehicleRegNumber) throws SQLException {
+    public boolean isRecurrent(String vehicleRegNumber) {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
