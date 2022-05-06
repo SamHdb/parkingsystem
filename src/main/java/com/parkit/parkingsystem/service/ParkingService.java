@@ -9,6 +9,7 @@ import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 
 public class ParkingService {
@@ -16,6 +17,8 @@ public class ParkingService {
     private static final Logger logger = LogManager.getLogger("ParkingService");
 
     private static FareCalculatorService fareCalculatorService = new FareCalculatorService();
+
+    private static final DecimalFormat df = new DecimalFormat("0.00");
 
     private InputReaderUtil inputReaderUtil;
     private ParkingSpotDAO parkingSpotDAO;
@@ -43,8 +46,13 @@ public class ParkingService {
                 ticket.setVehicleRegNumber(vehicleRegNumber);
                 ticket.setPrice(0);
                 ticket.setInTime(inTime);
+
                 ticket.setOutTime(null);
+                ticket.setRecurrent(ticketDAO.isRecurrent(vehicleRegNumber));
                 ticketDAO.saveTicket(ticket);
+                    if (ticket.isRecurrent()){
+                        System.out.println("Welcome back to your parking. You will benefit 5% discount");
+                    }
                 System.out.println("Generated Ticket and saved in DB");
                 System.out.println("Please park your vehicle in spot number:"+parkingSpot.getId());
                 System.out.println("Recorded in-time for vehicle number:"+vehicleRegNumber+" is:"+inTime);
@@ -54,7 +62,7 @@ public class ParkingService {
         }
     }
 
-    private String getVehichleRegNumber() throws Exception {
+    private String getVehichleRegNumber() {
         System.out.println("Please type the vehicle registration number and press enter key");
         return inputReaderUtil.readVehicleRegistrationNumber();
     }
@@ -108,8 +116,9 @@ public class ParkingService {
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
                 parkingSpot.setAvailable(true);
                 parkingSpotDAO.updateParking(parkingSpot);
-                System.out.println("Please pay the parking fare:" + ticket.getPrice());
-                System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
+                System.out.println("Please pay the parking fare:" + df.format(ticket.getPrice()));
+                System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber()
+                        + " is:" + outTime);
             }else{
                 System.out.println("Unable to update ticket information. Error occurred");
             }
